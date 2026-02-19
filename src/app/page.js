@@ -1,11 +1,11 @@
-import Image from "next/image";
+import ChatLayOut from "@/component/ChatLayOut";
 
 export default function Home() {
   return (
    <div>
-<div className="h-screen flex justify-center items-center">
-      <h3 className="text-4xl text-red-400"> well come to your farm </h3>
-
+<div>
+      
+<ChatLayOut/>
 </div>
 
 
