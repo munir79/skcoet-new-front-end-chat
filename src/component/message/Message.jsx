@@ -1,17 +1,31 @@
+"use client";
 
-
-// export default Message;
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGetMessageByUsersQuery, useSendMessageMutation } from '@/redux/features/MessageApi';
+import { getSocket } from '@/utils/socket';
 
 
 const Message = ({ id }) => {
     const [newMessage, setNewMessage] = useState('');
-    
+
     // Fetch messages
     const { data: getMessageByUsers, isLoading } = useGetMessageByUsersQuery(id);
-    const [sendMessage]=useSendMessageMutation()
-    
+    const [sendMessage] = useSendMessageMutation();
+
+    useEffect(() => {
+        const socket = getSocket();
+        console.log("socket", socket);
+        if (!socket) return;
+
+        socket.on("receiveMessage", (data) => {
+            console.log("New message:", data);
+        });
+
+        return () => {
+            socket.off("receiveMessage");
+        };
+    }, []);
+
     // Mutation to send message (Assuming this exists in your MessageApi)
 
     const handleSend = async (e) => {
@@ -42,15 +56,14 @@ const Message = ({ id }) => {
                     <p className='text-gray-500 text-center'>Loading messages...</p>
                 ) : (
                     getMessageByUsers?.data?.map((msg) => (
-                        <div 
-                            key={msg._id || msg.id} 
+                        <div
+                            key={msg._id || msg.id}
                             className={`flex ${msg.senderId === id ? 'justify-start' : 'justify-end'}`}
                         >
-                            <div className={`max-w-[80%] p-2 rounded-lg ${
-                                msg.senderId === id 
-                                ? 'bg-gray-700 text-white' 
+                            <div className={`max-w-[80%] p-2 rounded-lg ${msg.senderId === id
+                                ? 'bg-gray-700 text-white'
                                 : 'bg-blue-600 text-white'
-                            }`}>
+                                }`}>
                                 <p className='text-sm'>{msg.content}</p>
                             </div>
                         </div>
@@ -67,7 +80,7 @@ const Message = ({ id }) => {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                 />
-                <button 
+                <button
                     type="submit"
                     className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium'
                 >

@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { initSocket, disconnectSocket } from "@/lib/socket";
+import { disconnectSocket, initSocket } from "./socket";
+// import { initSocket, disconnectSocket } from "@/lib/socket";
 
 const SocketProvider = ({ children }) => {
-  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
-    if (token) initSocket(token);
+    const token = localStorage.getItem("accessToken");
 
-    return () => disconnectSocket();
-  }, [token]);
+    if (token) {
+      initSocket(token);
+    }
+
+    return () => {
+      disconnectSocket();
+    };
+  }, []);
 
   return children;
 };

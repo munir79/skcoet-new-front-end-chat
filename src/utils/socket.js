@@ -1,36 +1,33 @@
-// import { io } from "socket.io-client";
-// import { baseUriBackend } from "./url";
-
-// export const socket=io(baseUriBackend,{
-//     autoConnect:false,
-// })
-
-
 import { io } from "socket.io-client";
+import { baseUriBackend } from "./url";
 
 let socket = null;
 
-// Initialize socket with JWT
+// Connect socket
 export const initSocket = (token) => {
-  if (!token) return;
-
+  const url=baseUriBackend
   if (!socket) {
-    socket = io("http://localhost:5000", {
-      auth: { token },
-      autoConnect: true,
+    socket = io(url, {
+      auth: {
+        token, // send JWT to backend
+      },
+      transports: ["websocket"],
     });
 
-    socket.on("connect", () => console.log("🔌 Socket connected:", socket.id));
-    socket.on("disconnect", () => console.log("❌ Socket disconnected"));
-  }
+    socket.on("connect", () => {
+      console.log(" Socket connected:", socket.id);
+    });
 
-  return socket;
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+  }
 };
 
-// Get the existing socket instance
+// Get socket instance
 export const getSocket = () => socket;
 
-// Disconnect manually
+// Disconnect socket
 export const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
